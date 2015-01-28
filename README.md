@@ -181,10 +181,31 @@ The `install-feature` task installs a feature packaged as a Subsystem Archive (E
 | acceptLicense | Accept feature license terms and conditions. The default value is `false`. | No |
 | whenFileExits | Specifies the action to take if a file to be installed already exits. Use `fail` to abort the installation, `ignore` to continue the installation and ignore the file that exists, and `replace` to overwrite the existing file. | No | 
 | to | Specifies feature installation location. Set to `usr` to install as a user feature. Otherwise, set it to any configured product extension location. The default value is `usr`. | No |
-| name | Specifies the name of the Subsystem Archive (ESA file) to be installed. The name can a feature name, a file name or a URL. | Yes | 
+| name | Specifies the name of the Subsystem Archive (ESA file) to be installed. The name can be a feature name, a file name or a URL. | Yes | 
 
 #### Examples
     
 	<wlp:install-feature installDir="${wlp_install_dir}" name="mongodb-2.0" whenFileExists="ignore" acceptLicense="true"/>
+
+
+### uninstall-feature task
+---
+
+The `uninstall-feature` task uninstalls a feature from the Liberty runtime.
+
+#### Parameters
+
+| Attribute | Description | Required |
+| --------- | ------------ | ----------|
+| installDir | Location of the Liberty profile server installation. | Yes |
+| serverName | Name of the Liberty profile server instance. The default value is `defaultServer`. | No |
+| userDir | Value of the `${wlp_user_dir}` variable. The default value is `${installDir}/usr/servers/${serverName}`. | No | 
+| outputDir | Value of the `${wlp_output_dir}` variable. The default value is `${installDir}/usr/servers/${serverName}`. | No | 
+| noPrompts | Suppress confirmation messages to remove features and uninstalls features without any user interactions. The default value is `false`. | No |
+| name | Specify the feature to uninstall. This can be an IBM-Shortname or the Subsystem-SymbolicName of the Subsystem archive. | Yes | 
+
+#### Examples
+    
+	<wlp:uninstall-feature installDir="${wlp_install_dir}" name="mongodb-2.0" noPrompts="true"/>
 
 
