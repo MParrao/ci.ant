@@ -28,6 +28,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.management.openmbean.CompositeData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -152,12 +153,12 @@ public class RemoteServerManager  {
 
     public void startApp(String appName) {
         // Use the Application MBean to start an application of the remote server.
-        ObjectName ApplicationBeanName;
+        ObjectName applicationBeanName;
         try {
-            ApplicationBeanName = new ObjectName(
+            applicationBeanName = new ObjectName(
                     "WebSphere:service=com.ibm.websphere.application.ApplicationMBean,name="+appName);
-            if (mbsc.isRegistered(ApplicationBeanName)) {
-                mbsc.invoke(ApplicationBeanName, "start",
+            if (mbsc.isRegistered(applicationBeanName)) {
+                mbsc.invoke(applicationBeanName, "start",
                         null,
                         null);
                 System.out.println("The app " + appName + " has been started");//Add message to messages instead of hardcode
@@ -172,12 +173,12 @@ public class RemoteServerManager  {
 
     public void stopApp(String appName) {
         // Use the Application MBean to stop an application of the remote server.
-        ObjectName ApplicationBeanName;
+        ObjectName applicationBeanName;
         try {
-            ApplicationBeanName = new ObjectName(
+            applicationBeanName = new ObjectName(
                     "WebSphere:service=com.ibm.websphere.application.ApplicationMBean,name="+appName);
-            if (mbsc.isRegistered(ApplicationBeanName)) {
-                mbsc.invoke(ApplicationBeanName, "stop",
+            if (mbsc.isRegistered(applicationBeanName)) {
+                mbsc.invoke(applicationBeanName, "stop",
                         null,
                         null);
                 System.out.println("The app " + appName + " has been stoped");//Add message to messages instead of hardcode
@@ -192,12 +193,12 @@ public class RemoteServerManager  {
     
     public void appState(String appName) {
         // Use the Application MBean check the status of an application on the remote server.
-        ObjectName ApplicationBeanName;
+        ObjectName applicationBeanName;
         try {
-            ApplicationBeanName = new ObjectName(
+            applicationBeanName = new ObjectName(
                     "WebSphere:service=com.ibm.websphere.application.ApplicationMBean,name="+appName);
-            if (mbsc.isRegistered(ApplicationBeanName)) {
-                String state = (String) mbsc.getAttribute(ApplicationBeanName, "State"); 
+            if (mbsc.isRegistered(applicationBeanName)) {
+                String state = (String) mbsc.getAttribute(applicationBeanName, "State"); 
                 System.out.println("The state of the application " + appName + " is: " + state);//Add message to messages instead of hardcode
             } else {
                 throw new BuildException("The state of the application " + appName + " can't be resolved");//Add message to messages instead of hardcode
@@ -208,6 +209,63 @@ public class RemoteServerManager  {
         } 
     }
 
+    public void writeList() {
+        ObjectName fileServiceBean;
+        try {
+            fileServiceBean = new ObjectName(
+                    "WebSphere:feature=restConnector,type=FileService,name=FileService");
+                if (mbsc.isRegistered(fileServiceBean)) {
+                    String[] writeList = (String[])mbsc.getAttribute(fileServiceBean, "WriteList");
+
+                    for (String writeElement : writeList) {
+                        System.out.println("Write Element: "+writeElement);//Add message to messages instead of hardcode
+                    }
+                }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            throw new BuildException(e);
+        }
+    }
+
+    public void readList() {
+        ObjectName fileServiceBean;
+        try {
+            fileServiceBean = new ObjectName(
+                    "WebSphere:feature=restConnector,type=FileService,name=FileService");
+                if (mbsc.isRegistered(fileServiceBean)) {
+                    String[] readList = (String[])mbsc.getAttribute(fileServiceBean, "ReadList");
+
+                    for (String readElement : readList) {
+                        System.out.println("Read Element: "+readElement);//Add message to messages instead of hardcode
+                    }
+                }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            throw new BuildException(e);
+        }
+    }
+
+    public void appList() {
+        ObjectName fileServiceBean;
+        try {
+            fileServiceBean = new ObjectName(
+                    "WebSphere:feature=restConnector,type=FileService,name=FileService");
+                if (mbsc.isRegistered(fileServiceBean)) {
+                    CompositeData[] dropinsApps = (CompositeData[]) mbsc.invoke(fileServiceBean, "getDirectoryEntries",
+                                                            new Object[]{"${server.config.dir}/dropins/", Boolean.FALSE, "REQUEST_OPTIONS_ALL"},
+                                                            new String[]{String.class.getName(), boolean.class.getName(), String.class.getName()});
+
+
+                    for(CompositeData dropinsApp : dropinsApps ) {
+                        String name[] = dropinsApp.get("fileName").toString().split("/");
+                        System.out.println("Dropins Application: "+name[name.length-1]);//Add message to messages instead of hardcode
+                    }
+                }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            throw new BuildException(e);
+        }
+    }
     public void zipLogs() {
         ObjectName FileServiceBean;
         try {

@@ -50,6 +50,12 @@ public class RemoteServerTask extends AbstractRemoteTask {
                 rso.zipLogs();
             } else if ("downloadLogs".equals(operation)) {
                 rso.downloadLogs(localTargetFile);
+            } else if ("writeList".equals(operation)) {
+                rso.writeList();
+            } else if ("readList".equals(operation)) {
+                rso.readList();
+            }  else if ("appList".equals(operation)) {
+                rso.appList();
             } else {
                 throw new BuildException("Unsupported operation: " + operation);
             }
